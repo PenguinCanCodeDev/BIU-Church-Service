@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Moderate Hub | Staff</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --primary: #f43f5e; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .glass { background: var(--card); padding: 1.5rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; position: relative; }
+        h1 { margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        h2 { font-size: 1.2rem; margin-bottom: 1rem; opacity: 0.8; }
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.7rem; font-weight: 800; background: rgba(255,255,255,0.1); margin-bottom: 0.5rem; }
+        .controls { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .btn { padding: 0.5rem 1rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+        .btn-approve { background: #22c55e; color: white; }
+        .btn-delete { background: #f43f5e; color: white; }
+        .success { color: #22c55e; margin-bottom: 1rem; }
+        .nav-staff { margin-bottom: 2rem; display: flex; gap: 1rem; opacity: 0.7; }
+        .nav-staff a { color: white; text-decoration: none; font-size: 0.9rem; }
+        p { color: #94a3b8; line-height: 1.5; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-staff">
+            <a href="{% url 'manage_sermons' %}">Sermons</a> | 
+            <a href="{% url 'manage_lyrics' %}">Lyrics</a> | 
+            <a href="{% url 'manage_announcements' %}">Announcements</a> |
+            <a href="{% url 'index' %}">View Site</a>
+        </div>
+
+        <h1><i class="bi bi-megaphone"></i> Review Submissions</h1>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="success">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="grid">
+            <div class="column">
+                <h2>Pending Review</h2>
+                {% for p in pending %}
+                    <div class="glass">
+                        <span class="badge">{{ p.get_submission_type_display }}</span>
+                        <p>{{ p.content }}</p>
+                        <form method="POST" class="controls">
+                            {% csrf_token %}
+                            <input type="hidden" name="submission_id" value="{{ p.id }}">
+                            <button type="submit" name="action" value="approve" class="btn btn-approve">Approve</button>
+                            <button type="submit" name="action" value="delete" class="btn btn-delete">Reject</button>
+                        </form>
+                    </div>
+                {% empty %}
+                    <p>Clean inbox! No pending submissions.</p>
+                {% endfor %}
+            </div>
+
+            <div class="column">
+                <h2>Approved Posts</h2>
+                {% for a in approved %}
+                    <div class="glass" style="opacity: 0.6;">
+                        <span class="badge" style="background:#22c55e">{{ a.get_submission_type_display }}</span>
+                        <p>{{ a.content }}</p>
+                        <form method="POST" class="controls">
+                            {% csrf_token %}
+                            <input type="hidden" name="submission_id" value="{{ a.id }}">
+                            <button type="submit" name="action" value="delete" class="btn btn-delete">Delete</button>
+                        </form>
+                    </div>
+                {% empty %}
+                    <p>No approved announcements yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

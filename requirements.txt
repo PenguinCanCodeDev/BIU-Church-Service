@@ -1,0 +1,7 @@
+Django>=5.0
+django-cors-headers
+djangorestframework
+python-dotenv
+gunicorn
+whitenoise
+pillow

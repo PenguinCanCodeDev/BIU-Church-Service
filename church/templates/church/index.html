@@ -1,0 +1,306 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ service.name|default:"BIU Services" }} Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'church/style.css' %}?v=1.2">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --service-color: {{ service.theme_color|default:"#6366f1" }};
+        }
+    </style>
+</head>
+<body class="mobile-nav-closed">
+    <!-- Mobile Menu Overlay -->
+    <div class="menu-overlay" onclick="toggleMobileNav()"></div>
+
+    <div class="app-container">
+        <!-- Mobile Header Bar -->
+        <header class="mobile-top-bar">
+            <button class="menu-toggle" onclick="toggleMobileNav()">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="mobile-logo-box">
+                {% if service.name == "BIU" %}
+                    <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU">
+                {% elif service.name == "CFI" %}
+                    <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI">
+                {% elif service.name == "OASIS" %}
+                    <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS">
+                {% else %}
+                    <img src="{% static 'church/images/service_hub.svg' %}" alt="Hub">
+                {% endif %}
+                <span>{{ service.name|default:"Service Hub" }}</span>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation (Drawer on Mobile) -->
+        <nav class="side-nav" id="mainNav">
+            <div class="logo-container">
+                {% if service.name == "BIU" %}
+                    <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU Logo">
+                {% elif service.name == "CFI" %}
+                    <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI Logo">
+                {% elif service.name == "OASIS" %}
+                    <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS Logo">
+                {% else %}
+                    <img src="{% static 'church/images/service_hub.svg' %}" alt="Service Hub">
+                {% endif %}
+                <h2>{{ service.name|default:"Service Hub" }}</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active" onclick="switchSection('home')"><i class="bi bi-house-door"></i> <span>Home</span></li>
+                <li onclick="switchSection('lyrics')"><i class="bi bi-music-note-beamed"></i> <span>Lyrics</span></li>
+                <li onclick="switchSection('accounts')"><i class="bi bi-credit-card"></i> <span>Giving</span></li>
+                <li onclick="switchSection('sermons')"><i class="bi bi-broadcast"></i> <span>Sermons</span></li>
+                <li onclick="switchSection('announcements')"><i class="bi bi-megaphone"></i> <span>Announcements</span></li>
+                <li onclick="switchSection('submit')"><i class="bi bi-chat-dots"></i> <span>Suggest</span></li>
+            </ul>
+        </nav>
+
+        <main class="content-area">
+            <div class="content-wrapper">
+                <header class="content-header">
+                    <div>
+                    <h1 id="page-title">Welcome</h1>
+                    <p class="date-text">{{ today|date:"l, F j, Y" }}</p>
+                    </div>
+                </header>
+
+                <!-- Home Section -->
+            <section id="home-section" class="section active">
+                <div class="hero-card glass">
+                    <div class="hero-content">
+                        {% if service %}
+                            <h1>Welcome to {{ service.name }}</h1>
+                            <p>Everything you need for today's service in one place.</p>
+                        {% else %}
+                            <h1>BIU Services Hub</h1>
+                            <p>Welcome to our centralized church hub. Please check back on Tuesday, Thursday, or Sunday!</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="quick-stats">
+                    <div class="stat-card glass clickable" onclick="switchSection('lyrics')">
+                        <i class="bi bi-music-note"></i>
+                        <h3>Lyrics</h3>
+                        <p>Follow the choir</p>
+                    </div>
+                    <div class="stat-card glass clickable" onclick="switchSection('accounts')">
+                       <i class="bi bi-bank"></i>
+                       <h3>Giving</h3>
+                       <p>Tithe & Offering</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lyrics Section -->
+            <section id="lyrics-section" class="section">
+                <div class="lyrics-grid">
+                    {% for lyric in service.lyrics.all %}
+                        <div class="lyric-card">
+                            <h3>{{ lyric.title }}</h3>
+                            <pre>{{ lyric.content }}</pre>
+                        </div>
+                    {% empty %}
+                        <div class="glass" style="grid-column: 1/-1;">No lyrics added yet for this service.</div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Giving Section -->
+            <section id="accounts-section" class="section">
+                <div class="accounts-grid">
+                    {% for account in service.accounts.all %}
+                        <div class="account-card">
+                            <h3>{{ account.account_type }}</h3>
+                            <div class="account-name-label">{{ account.account_name }}</div>
+                            <div class="account-number">{{ account.account_number }}</div>
+                            <div class="bank-name">{{ account.bank_name }}</div>
+                        </div>
+                    {% empty %}
+                        <div class="glass" style="grid-column: 1/-1;">No account details available for this service.</div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Sermons Section -->
+            <section id="sermons-section" class="section">
+                <div class="sermons-list">
+                    {% for sermon in service.sermons.all %}
+                        <div class="sermon-item">
+                            <div class="sermon-date">{{ sermon.date_preached }}</div>
+                            <h3>{{ sermon.title }}</h3>
+                            <p>{{ sermon.notes_or_link }}</p>
+                        </div>
+                    {% empty %}
+                        <div class="glass">No sermons recorded yet.</div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Announcements Section -->
+            <section id="announcements-section" class="section">
+                <div class="announcements-list">
+                    {% for ann in announcements %}
+                        <div class="announcement-item">
+                            <div class="announcement-date">{{ ann.created_at|date:"M d, Y" }}</div>
+                            <h3>{{ ann.get_submission_type_display|upper }}</h3>
+                            <p>{{ ann.content }}</p>
+                        </div>
+                    {% empty %}
+                        <div class="glass">No active announcements today.</div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Submit Section -->
+            <section id="submit-section" class="section">
+                <div class="form-card glass">
+                    <h2>Share Your Thoughts</h2>
+                    <p class="form-subtext">Suggestions, announcements, or complaints—we value your voice.</p>
+                    <form id="submission-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="submission_type">Type</label>
+                            <select name="submission_type" id="submission_type" required>
+                                <option value="suggestion">Suggestion</option>
+                                <option value="announcement">Announcement (Awaits Review)</option>
+                                <option value="complaint">Complaint</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="content">Message</label>
+                            <textarea name="content" id="content" rows="5" placeholder="Share your message here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Send Message</button>
+                    </form>
+                    <div id="form-feedback"></div>
+                </div>
+            </section>
+            </div> <!-- End content-wrapper -->
+
+            <!-- Premium Footer -->
+            <footer class="app-footer">
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <div class="footer-logo">
+                            {% if service.name == "BIU" %}
+                                <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU">
+                            {% elif service.name == "CFI" %}
+                                <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI">
+                            {% elif service.name == "OASIS" %}
+                                <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS">
+                            {% else %}
+                                <img src="{% static 'church/images/service_hub.svg' %}" alt="Hub">
+                            {% endif %}
+                            <span>{{ service.name|default:"Service Hub" }}</span>
+                        </div>
+                        <p class="footer-tagline">Building a community of faith, hope, and love.</p>
+                    </div>
+
+                    <div class="footer-links">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li onclick="switchSection('lyrics')">Choir Lyrics</li>
+                            <li onclick="switchSection('sermons')">Sermon Notes</li>
+                            <li onclick="switchSection('announcements')">Recent News</li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-social">
+                        <h4>Connect</h4>
+                        <div class="social-icons">
+                            {% if service.tiktok_url %}<a href="{{ service.tiktok_url }}" target="_blank"><i class="bi bi-tiktok"></i></a>{% endif %}
+                            {% if service.instagram_url %}<a href="{{ service.instagram_url }}" target="_blank"><i class="bi bi-instagram"></i></a>{% endif %}
+                            {% if service.youtube_url %}<a href="{{ service.youtube_url }}" target="_blank"><i class="bi bi-youtube"></i></a>{% endif %}
+                            {% if service.twitter_url %}<a href="{{ service.twitter_url }}" target="_blank"><i class="bi bi-twitter-x"></i></a>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')" style="cursor:pointer; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                        &copy; {% now "Y" %} Penguins Can Code. All rights reserved.
+                    </p>
+                    <p class="built-by">Built by 
+                        <span class="creator-id-container" onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')">
+                            <span class="id-text">ID</span>
+                            <span class="founder-text">Founder of PCC</span>
+                        </span>
+                    </p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Core App Logic -->
+    <script>
+        function toggleMobileNav() {
+            document.body.classList.toggle('mobile-nav-open');
+        }
+
+        function switchSection(id) {
+            // Close mobile nav after selection
+            document.body.classList.remove('mobile-nav-open');
+            
+            // Update Active Nav Link
+            document.querySelectorAll(".nav-links li").forEach(l => l.classList.remove("active"));
+            const activeLink = document.querySelector(`.nav-links li[onclick*="'${id}'"]`);
+            if(activeLink) activeLink.classList.add("active");
+
+            // Update Active Section
+            document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+            const activeSection = document.getElementById(`${id}-section`);
+            if(activeSection) activeSection.classList.add("active");
+
+            // Update Title
+            document.getElementById("page-title").textContent = id.charAt(0).toUpperCase() + id.slice(1);
+            
+            // Scroll to top
+            document.querySelector(".content-area").scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Form Submission via AJAX (still using the API endpoint for better UX)
+        const form = document.getElementById("submission-form");
+        const feedback = document.getElementById("form-feedback");
+
+        if(form) {
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const formData = {
+                    submission_type: form.submission_type.value,
+                    content: form.content.value
+                };
+
+                try {
+                    const res = await fetch("/api/submissions/", {
+                        method: "POST",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (res.ok) {
+                        form.reset();
+                        feedback.innerHTML = `<p style="color:#22c55e; margin-top:1rem;">Thank you! Your submission has been sent for review.</p>`;
+                        setTimeout(() => feedback.innerHTML = "", 5000);
+                    } else {
+                        throw new Error("Error submitting");
+                    }
+                } catch (err) {
+                    feedback.innerHTML = `<p style="color:#f43f5e; margin-top:1rem;">Oops! Something went wrong.</p>`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
