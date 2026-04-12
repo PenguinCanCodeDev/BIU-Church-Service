@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error | OASIS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'church/style.css' %}?v=1.2">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: #000;
+        }
+        .error-container {
+            text-align: center;
+            max-width: 500px;
+        }
+        .error-code {
+            font-family: 'Outfit', sans-serif;
+            font-size: 8rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -5px;
+            background: linear-gradient(to bottom, #fff, #333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .error-message {
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        .btn-home {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2.5rem;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">500</div>
+        <div class="glass">
+            <h1 style="margin: 0; font-family: 'Outfit';">A Brief Interruption</h1>
+            <p class="error-message">Something went wrong on our end. We're working to restore the connection. Please try again in a moment.</p>
+            <a href="/" class="btn-home">Refresh Page</a>
+        </div>
+    </div>
+</body>
+</html>
