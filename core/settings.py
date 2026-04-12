@@ -125,6 +125,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'church' / 'static',
+]
 
 # Use Whitenoise only in production for better local dev performance
 if not DEBUG:
