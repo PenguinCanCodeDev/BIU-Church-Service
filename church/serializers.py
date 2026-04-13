@@ -23,7 +23,11 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = ['id', 'name', 'day_of_week', 'logo', 'theme_color', 'accounts', 'lyrics', 'sermons']
+        fields = [
+            'id', 'name', 'day_of_week', 'logo', 'theme_color', 
+            'tiktok_url', 'instagram_url', 'youtube_url', 'twitter_url', 'whatsapp_url',
+            'accounts', 'lyrics', 'sermons'
+        ]
 
 class UserSubmissionSerializer(serializers.ModelSerializer):
     class Meta:

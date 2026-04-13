@@ -16,6 +16,7 @@ class Service(models.Model):
     instagram_url = models.URLField(max_length=500, blank=True, null=True, help_text="Full URL to Instagram profile")
     youtube_url = models.URLField(max_length=500, blank=True, null=True, help_text="Full URL to YouTube channel")
     twitter_url = models.URLField(max_length=500, blank=True, null=True, help_text="Full URL to Twitter/X profile")
+    whatsapp_url = models.URLField(max_length=500, blank=True, null=True, help_text="Full URL to WhatsApp group or contact")
 
     def __str__(self):
         return f"{self.name} ({self.get_day_of_week_display()})"
