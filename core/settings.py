@@ -83,8 +83,15 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'PCCscan',  # You can change this to your preferred database name
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': os.getenv('DB_HOST'),
+            'tls': True,
+            'tlsAllowInvalidCertificates': True,
+            'retryWrites': True,
+        }
     }
 }
 
@@ -140,3 +147,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

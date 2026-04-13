@@ -16,7 +16,7 @@ def index(request):
     # Approved announcements for the sidebar/feed
     announcements = UserSubmission.objects.filter(
         submission_type='announcement', 
-        is_approved=True
+        is_approved__in=[True]
     ).order_by('-created_at')[:5]
 
     context = {
@@ -51,23 +51,36 @@ class UserSubmissionCreateView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
 class AnnouncementListView(generics.ListAPIView):
-    queryset = UserSubmission.objects.filter(submission_type='announcement', is_approved=True).order_by('-created_at')
+    queryset = UserSubmission.objects.filter(submission_type='announcement', is_approved__in=[True]).order_by('-created_at')
     serializer_class = UserSubmissionSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        return UserSubmission.objects.filter(submission_type='announcement', is_approved=True).order_by('-created_at')
+        return UserSubmission.objects.filter(submission_type='announcement', is_approved__in=[True]).order_by('-created_at')
 
 # Staff Security Logic
-def is_church_staff(user):
-    # This keeps them OUT of the Admin but IN the custom portals
-    # They just need to be in a group named 'Staff' OR be a superuser
-    return user.is_authenticated and (user.groups.filter(name='Staff').exists() or user.is_superuser)
+def is_sermon_staff(user):
+    if not user.is_authenticated: return False
+    if user.is_superuser: return True
+    group_names = user.groups.all().values_list('name', flat=True)
+    return 'SermonManagers' in group_names
+
+def is_lyric_staff(user):
+    if not user.is_authenticated: return False
+    if user.is_superuser: return True
+    group_names = user.groups.all().values_list('name', flat=True)
+    return 'LyricManagers' in group_names
+
+def is_announcement_staff(user):
+    if not user.is_authenticated: return False
+    if user.is_superuser: return True
+    group_names = user.groups.all().values_list('name', flat=True)
+    return 'AnnouncementManagers' in group_names
 
 # Staff Views (Protected)
 
 @login_required
-@user_passes_test(is_church_staff, login_url='login')
+@user_passes_test(is_sermon_staff, login_url='login')
 def manage_sermons(request):
     """ View for Sermon Managers. """
     from .models import Sermon
@@ -87,7 +100,7 @@ def manage_sermons(request):
     return render(request, 'church/staff/sermons.html', {'services': services, 'sermons': sermons})
 
 @login_required
-@user_passes_test(is_church_staff, login_url='login')
+@user_passes_test(is_lyric_staff, login_url='login')
 def manage_lyrics(request):
     """ View for Lyric Managers. """
     from .models import Lyric
@@ -106,24 +119,35 @@ def manage_lyrics(request):
     return render(request, 'church/staff/lyrics.html', {'services': services, 'lyrics': lyrics})
 
 @login_required
-@user_passes_test(is_church_staff, login_url='login')
+@user_passes_test(is_announcement_staff, login_url='login')
 def manage_announcements(request):
     """ View for Announcement Moderators. """
     if request.method == "POST":
-        submission_id = request.POST.get('submission_id')
-        action = request.POST.get('action') # approve or delete
+        action = request.POST.get('action') 
         
-        submission = get_object_or_404(UserSubmission, id=submission_id)
-        if action == "approve":
-            submission.is_approved = True
-            submission.save()
-            messages.success(request, "Announcement approved and posted!")
-        elif action == "delete":
-            submission.delete()
-            messages.success(request, "Submission removed.")
+        if action == "create":
+            content = request.POST.get('content')
+            image = request.FILES.get('image')
+            UserSubmission.objects.create(
+                submission_type='announcement',
+                content=content,
+                image=image,
+                is_approved=True
+            )
+            messages.success(request, "Announcement posted successfully!")
+        else:
+            submission_id = request.POST.get('submission_id')
+            submission = get_object_or_404(UserSubmission, id=submission_id)
+            if action == "approve":
+                submission.is_approved = True
+                submission.save()
+                messages.success(request, "Announcement approved and posted!")
+            elif action == "delete":
+                submission.delete()
+                messages.success(request, "Submission removed.")
         
         return redirect('manage_announcements')
 
-    pending = UserSubmission.objects.filter(is_approved=False).order_by('-created_at')
-    approved = UserSubmission.objects.filter(is_approved=True).order_by('-created_at')
+    pending = UserSubmission.objects.filter(is_approved__in=[False]).order_by('-created_at')
+    approved = UserSubmission.objects.filter(is_approved__in=[True]).order_by('-created_at')
     return render(request, 'church/staff/announcements.html', {'pending': pending, 'approved': approved})

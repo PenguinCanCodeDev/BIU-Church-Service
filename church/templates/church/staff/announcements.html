@@ -7,21 +7,52 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root { --primary: #f43f5e; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
-        .container { max-width: 900px; margin: 0 auto; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; margin: 0; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
         .glass { background: var(--card); padding: 1.5rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; position: relative; }
-        h1 { margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
-        h2 { font-size: 1.2rem; margin-bottom: 1rem; opacity: 0.8; }
+        h1 { margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.8rem; }
+        h2 { font-size: 1.1rem; margin-bottom: 1rem; opacity: 0.8; }
         .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.7rem; font-weight: 800; background: rgba(255,255,255,0.1); margin-bottom: 0.5rem; }
         .controls { display: flex; gap: 0.5rem; margin-top: 1rem; }
-        .btn { padding: 0.5rem 1rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+        .btn { padding: 0.5rem 1.2rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
         .btn-approve { background: #22c55e; color: white; }
         .btn-delete { background: #f43f5e; color: white; }
-        .success { color: #22c55e; margin-bottom: 1rem; }
-        .nav-staff { margin-bottom: 2rem; display: flex; gap: 1rem; opacity: 0.7; }
-        .nav-staff a { color: white; text-decoration: none; font-size: 0.9rem; }
-        p { color: #94a3b8; line-height: 1.5; font-size: 0.9rem; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .success { color: #22c55e; margin-bottom: 1rem; font-weight: 500; font-size: 0.9rem; }
+        .nav-staff { margin-bottom: 2rem; display: flex; gap: 1rem; opacity: 0.7; flex-wrap: wrap; }
+        .nav-staff a { color: white; text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+        p { color: #94a3b8; line-height: 1.5; font-size: 0.9rem; margin: 0.5rem 0; }
+
+        /* Custom File Input */
+        .file-upload { position: relative; display: inline-block; cursor: pointer; }
+        .file-upload input[type="file"] { display: none; }
+        .file-label {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.3s ease;
+        }
+        .file-upload:hover .file-label {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1.5rem 1rem; }
+            .grid { grid-template-columns: 1fr; gap: 1rem; }
+            h1 { font-size: 1.5rem; }
+            .nav-staff { gap: 0.8rem; font-size: 0.8rem; }
+            .quick-post-footer { flex-direction: column; align-items: stretch !important; gap: 1rem; }
+            .btn-approve { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -41,6 +72,36 @@
             {% endfor %}
         {% endif %}
 
+        <div class="glass" style="margin-bottom: 3rem;">
+            <h2><i class="bi bi-plus-circle"></i> Quick Post</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="margin-bottom: 1.5rem;">
+                    <textarea name="content" placeholder="What's happening? Type your announcement here..." style="width: 100%; border-radius: 12px; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; min-height: 100px; font-family: inherit; font-size: 1rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" required></textarea>
+                </div>
+                <div class="quick-post-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+                    <label class="file-upload">
+                        <input type="file" name="image" accept="image/*" onchange="updateFileName(this)">
+                        <div class="file-label" id="file-label-text">
+                            <i class="bi bi-image"></i> Add Image
+                        </div>
+                    </label>
+                    <button type="submit" name="action" value="create" class="btn btn-approve" style="padding: 0.8rem 2.5rem; border-radius: 12px; font-size: 1rem; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);">Post Now</button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            function updateFileName(input) {
+                const label = document.getElementById('file-label-text');
+                if (input.files && input.files.length > 0) {
+                    label.innerHTML = `<i class="bi bi-check-circle-fill" style="color:#22c55e"></i> ${input.files[0].name.substring(0, 15)}...`;
+                    label.style.borderColor = '#22c55e';
+                    label.style.color = 'white';
+                }
+            }
+        </script>
+
         <div class="grid">
             <div class="column">
                 <h2>Pending Review</h2>
@@ -48,6 +109,9 @@
                     <div class="glass">
                         <span class="badge">{{ p.get_submission_type_display }}</span>
                         <p>{{ p.content }}</p>
+                        {% if p.image %}
+                            <img src="{{ p.image.url }}" alt="Submission Image" style="max-width: 100%; border-radius: 10px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1);">
+                        {% endif %}
                         <form method="POST" class="controls">
                             {% csrf_token %}
                             <input type="hidden" name="submission_id" value="{{ p.id }}">
@@ -66,6 +130,9 @@
                     <div class="glass" style="opacity: 0.6;">
                         <span class="badge" style="background:#22c55e">{{ a.get_submission_type_display }}</span>
                         <p>{{ a.content }}</p>
+                        {% if a.image %}
+                            <img src="{{ a.image.url }}" alt="Submission Image" style="max-width: 100%; border-radius: 10px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1); opacity: 0.8;">
+                        {% endif %}
                         <form method="POST" class="controls">
                             {% csrf_token %}
                             <input type="hidden" name="submission_id" value="{{ a.id }}">

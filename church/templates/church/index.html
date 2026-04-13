@@ -121,7 +121,12 @@
                         <div class="account-card">
                             <h3>{{ account.account_type }}</h3>
                             <div class="account-name-label">{{ account.account_name }}</div>
-                            <div class="account-number">{{ account.account_number }}</div>
+                            <div class="account-number-box">
+                                <span class="account-number" id="acc-{{ forloop.counter }}">{{ account.account_number }}</span>
+                                <button class="copy-btn" onclick="copyToClipboard('acc-{{ forloop.counter }}')">
+                                    <i class="bi bi-copy"></i> Copy
+                                </button>
+                            </div>
                             <div class="bank-name">{{ account.bank_name }}</div>
                         </div>
                     {% empty %}
@@ -153,6 +158,11 @@
                             <div class="announcement-date">{{ ann.created_at|date:"M d, Y" }}</div>
                             <h3>{{ ann.get_submission_type_display|upper }}</h3>
                             <p>{{ ann.content }}</p>
+                            {% if ann.image %}
+                                <div class="announcement-image">
+                                    <img src="{{ ann.image.url }}" alt="Announcement Image" style="max-width: 100%; border-radius: 12px; margin-top: 1rem;">
+                                </div>
+                            {% endif %}
                         </div>
                     {% empty %}
                         <div class="glass">No active announcements today.</div>
@@ -179,7 +189,15 @@
                             <label for="content">Message</label>
                             <textarea name="content" id="content" rows="5" placeholder="Share your message here..." required></textarea>
                         </div>
-                        <button type="submit" class="btn-primary">Send Message</button>
+                        <div class="form-group">
+                            <label for="image">Attachment (Optional)</label>
+                            <input type="file" name="image" id="image" accept="image/*" class="custom-file-input">
+                        </div>
+                        <div id="image-preview" style="margin-top: 1rem; display: none;">
+                            <img id="preview-img" src="" alt="Preview" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <p id="preview-filename" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;"></p>
+                        </div>
+                        <button type="submit" class="btn-primary" style="margin-top: 2rem;">Send Message</button>
                     </form>
                     <div id="form-feedback"></div>
                 </div>
@@ -221,6 +239,12 @@
                             {% if service.instagram_url %}<a href="{{ service.instagram_url }}" target="_blank"><i class="bi bi-instagram"></i></a>{% endif %}
                             {% if service.youtube_url %}<a href="{{ service.youtube_url }}" target="_blank"><i class="bi bi-youtube"></i></a>{% endif %}
                             {% if service.twitter_url %}<a href="{{ service.twitter_url }}" target="_blank"><i class="bi bi-twitter-x"></i></a>{% endif %}
+                            
+                            {% if not service %}
+                                <a href="#" title="TikTok"><i class="bi bi-tiktok"></i></a>
+                                <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+                                <a href="#" title="YouTube"><i class="bi bi-youtube"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -267,26 +291,59 @@
             document.querySelector(".content-area").scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector(`button[onclick="copyToClipboard('${elementId}')"]`);
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+                btn.style.background = '#22c55e';
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
         // Form Submission via AJAX (still using the API endpoint for better UX)
         const form = document.getElementById("submission-form");
         const feedback = document.getElementById("form-feedback");
 
+        // Image Preview Logic
+        const imageInput = document.getElementById('image');
+        const previewContainer = document.getElementById('image-preview');
+        const previewImg = document.getElementById('preview-img');
+        const previewFilename = document.getElementById('preview-filename');
+
+        if(imageInput) {
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    previewFilename.textContent = file.name;
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewContainer.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContainer.style.display = 'none';
+                }
+            });
+        }
+
         if(form) {
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
-                const formData = {
-                    submission_type: form.submission_type.value,
-                    content: form.content.value
-                };
+                const formData = new FormData(form);
 
                 try {
                     const res = await fetch("/api/submissions/", {
                         method: "POST",
                         headers: { 
-                            "Content-Type": "application/json",
                             "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
                         },
-                        body: JSON.stringify(formData)
+                        body: formData
                     });
 
                     if (res.ok) {

@@ -28,5 +28,5 @@ class ServiceSerializer(serializers.ModelSerializer):
 class UserSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSubmission
-        fields = ['id', 'submission_type', 'content', 'is_approved', 'created_at']
+        fields = ['id', 'submission_type', 'content', 'image', 'is_approved', 'created_at']
         read_only_fields = ['is_approved', 'created_at']
