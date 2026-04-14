@@ -477,6 +477,24 @@ body {
     font-size: 0.85rem;
 }
 
+.footer-credits {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    text-align: right;
+}
+
+.developed-by {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.developed-by strong {
+    color: #fff;
+    font-weight: 700;
+}
+
 .built-by {
     margin: 0;
 }
@@ -564,6 +582,11 @@ body {
     .footer-bottom {
         flex-direction: column;
         gap: 0.8rem;
+        text-align: center;
+    }
+
+    .footer-credits {
+        align-items: center;
         text-align: center;
     }
 }
