@@ -79,10 +79,10 @@
                     <div class="hero-content">
                         {% if service %}
                             <h1>Welcome to {{ service.name }}</h1>
-                            <p>Everything you need for today's service in one place.</p>
+                            <p>Your spiritual companion for today's service. Access lyrics, giving details, and sermon notes in real-time.</p>
                         {% else %}
                             <h1>BIU Services Hub</h1>
-                            <p>Welcome to our centralized church hub. Please check back on Tuesday, Thursday, or Sunday!</p>
+                            <p>Connecting our community through faith. Please join us for our scheduled services on Tuesday, Thursday, and Sunday!</p>
                         {% endif %}
                     </div>
                 </div>
@@ -254,12 +254,15 @@
                     <p onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')" style="cursor:pointer; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                         &copy; {% now "Y" %} Penguins Can Code. All rights reserved.
                     </p>
-                    <p class="built-by">Built by 
-                        <span class="creator-id-container" onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')">
-                            <span class="id-text">ID</span>
-                            <span class="founder-text">Founder of PCC</span>
-                        </span>
-                    </p>
+                    <div class="footer-credits">
+                        <p class="developed-by">Developed by <strong>Nelson Ighodaro</strong></p>
+                        <p class="built-by">Built by 
+                            <span class="creator-id-container" onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')">
+                                <span class="id-text">ID</span>
+                                <span class="founder-text">Founder of PCC</span>
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </footer>
         </main>
