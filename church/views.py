@@ -11,13 +11,15 @@ from .serializers import ServiceSerializer, UserSubmissionSerializer
 def index(request):
     """ Main entry point using Django Templates. """
     current_day = datetime.today().weekday()
-    service = Service.objects.filter(day_of_week=current_day).first()
+    # Use .iterator() to avoid broken fetchmany in some djongo/django 4.x environments
+    service_qs = Service.objects.filter(day_of_week=current_day)
+    service = next(service_qs.iterator(), None)
     
     # Approved announcements for the sidebar/feed
-    announcements = UserSubmission.objects.filter(
+    announcements = list(UserSubmission.objects.filter(
         submission_type='announcement', 
-        is_approved__in=[True]
-    ).order_by('-created_at')[:5]
+        is_approved=True
+    ).order_by('-created_at')[:5].iterator())
 
     context = {
         'service': service,
@@ -33,7 +35,8 @@ def get_current_service(request):
     API Version: Determines today's service based on the day of the week.
     """
     current_day = datetime.today().weekday()
-    service = Service.objects.filter(day_of_week=current_day).first()
+    service_qs = Service.objects.filter(day_of_week=current_day)
+    service = next(service_qs.iterator(), None)
     
     if not service:
         return Response({
