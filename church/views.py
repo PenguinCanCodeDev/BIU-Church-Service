@@ -16,9 +16,10 @@ def index(request):
     service = next(service_qs.iterator(), None)
     
     # Approved announcements for the sidebar/feed
+    # Using __in helps Djongo's parser avoid issues with bare boolean columns
     announcements = list(UserSubmission.objects.filter(
-        submission_type='announcement', 
-        is_approved=True
+        submission_type__in=['announcement'], 
+        is_approved__in=[True]
     ).order_by('-created_at')[:5].iterator())
 
     context = {
