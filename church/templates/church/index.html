@@ -1,21 +1,31 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ service.name|default:"BIU Services" }} Hub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{% static 'church/style.css' %}?v=1.2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root {
-            --service-color: {{ service.theme_color|default:"#6366f1" }};
+            --service-color: {
+                    {
+                    service.theme_color|default: "#6366f1"
+                }
+            }
+
+            ;
         }
     </style>
 </head>
+
 <body class="mobile-nav-closed">
     <!-- Mobile Menu Overlay -->
     <div class="menu-overlay" onclick="toggleMobileNav()"></div>
@@ -28,15 +38,15 @@
             </button>
             <div class="mobile-logo-box">
                 {% if service.logo %}
-                    <img src="{{ service.logo.url }}" alt="{{ service.name }}">
+                <img src="{{ service.logo.url }}" alt="{{ service.name }}">
                 {% elif service.name == "BIU" %}
-                    <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU">
+                <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU">
                 {% elif service.name == "CFI" %}
-                    <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI">
+                <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI">
                 {% elif service.name == "OASIS" %}
-                    <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS">
+                <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS">
                 {% else %}
-                    <img src="{% static 'church/images/service_hub.svg' %}" alt="Hub">
+                <img src="{% static 'church/images/service_hub.svg' %}" alt="Hub">
                 {% endif %}
                 <span>{{ service.name|default:"Service Hub" }}</span>
             </div>
@@ -46,24 +56,26 @@
         <nav class="side-nav" id="mainNav">
             <div class="logo-container">
                 {% if service.logo %}
-                    <img src="{{ service.logo.url }}" alt="{{ service.name }} Logo">
+                <img src="{{ service.logo.url }}" alt="{{ service.name }} Logo">
                 {% elif service.name == "BIU" %}
-                    <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU Logo">
+                <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU Logo">
                 {% elif service.name == "CFI" %}
-                    <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI Logo">
+                <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI Logo">
                 {% elif service.name == "OASIS" %}
-                    <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS Logo">
+                <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS Logo">
                 {% else %}
-                    <img src="{% static 'church/images/service_hub.svg' %}" alt="Service Hub">
+                <img src="{% static 'church/images/service_hub.svg' %}" alt="Service Hub">
                 {% endif %}
                 <h2>{{ service.name|default:"Service Hub" }}</h2>
             </div>
             <ul class="nav-links">
-                <li class="active" onclick="switchSection('home')"><i class="bi bi-house-door"></i> <span>Home</span></li>
+                <li class="active" onclick="switchSection('home')"><i class="bi bi-house-door"></i> <span>Home</span>
+                </li>
                 <li onclick="switchSection('lyrics')"><i class="bi bi-music-note-beamed"></i> <span>Lyrics</span></li>
                 <li onclick="switchSection('accounts')"><i class="bi bi-credit-card"></i> <span>Giving</span></li>
                 <li onclick="switchSection('sermons')"><i class="bi bi-broadcast"></i> <span>Sermons</span></li>
-                <li onclick="switchSection('announcements')"><i class="bi bi-megaphone"></i> <span>Announcements</span></li>
+                <li onclick="switchSection('announcements')"><i class="bi bi-megaphone"></i> <span>Announcements</span>
+                </li>
                 <li onclick="switchSection('submit')"><i class="bi bi-chat-dots"></i> <span>Suggest</span></li>
             </ul>
         </nav>
@@ -72,143 +84,151 @@
             <div class="content-wrapper">
                 <header class="content-header">
                     <div>
-                    <h1 id="page-title">Welcome</h1>
-                    <p class="date-text">{{ today|date:"l, F j, Y" }}</p>
+                        <h1 id="page-title">Welcome</h1>
+                        <p class="date-text">{{ today|date:"l, F j, Y" }}</p>
                     </div>
                 </header>
 
                 <!-- Home Section -->
-            <section id="home-section" class="section active">
-                <div class="hero-card glass">
-                    <div class="hero-content">
-                        {% if service %}
+                <section id="home-section" class="section active">
+                    <div class="hero-card glass">
+                        <div class="hero-content">
+                            {% if service %}
                             <h1>Welcome to {{ service.name }}</h1>
                             <p>
                                 {% if service.name == "CFI" %}CFI o CFI, What a JOY... {% endif %}
-                                our spiritual companion for today's service. Access lyrics, giving details, and sermon notes in real-time.
+                                Your spiritual companion for today's service. Access lyrics, giving details, and sermon
+                                notes in real-time.
                             </p>
-                        {% else %}
+                            {% else %}
                             <h1>BIU Services Hub</h1>
-                            <p>Connecting our community through faith. Please join us for our scheduled services on Tuesday, Thursday, and Sunday!</p>
-                        {% endif %}
+                            <p>Connecting our community through faith. Please join us for our scheduled services on
+                                Tuesday, Thursday, and Sunday!</p>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-                <div class="quick-stats">
-                    <div class="stat-card glass clickable" onclick="switchSection('lyrics')">
-                        <i class="bi bi-music-note"></i>
-                        <h3>Lyrics</h3>
-                        <p>Follow the choir</p>
+                    <div class="quick-stats">
+                        <div class="stat-card glass clickable" onclick="switchSection('lyrics')">
+                            <i class="bi bi-music-note"></i>
+                            <h3>Lyrics</h3>
+                            <p>Follow the choir</p>
+                        </div>
+                        <div class="stat-card glass clickable" onclick="switchSection('accounts')">
+                            <i class="bi bi-bank"></i>
+                            <h3>Giving</h3>
+                            <p>Tithe & Offering</p>
+                        </div>
                     </div>
-                    <div class="stat-card glass clickable" onclick="switchSection('accounts')">
-                       <i class="bi bi-bank"></i>
-                       <h3>Giving</h3>
-                       <p>Tithe & Offering</p>
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Lyrics Section -->
-            <section id="lyrics-section" class="section">
-                <div class="lyrics-grid">
-                    {% for lyric in service.lyrics.all %}
+                <!-- Lyrics Section -->
+                <section id="lyrics-section" class="section">
+                    <div class="lyrics-grid">
+                        {% for lyric in service.lyrics.all %}
                         <div class="lyric-card">
                             <h3>{{ lyric.title }}</h3>
                             <pre>{{ lyric.content }}</pre>
                         </div>
-                    {% empty %}
+                        {% empty %}
                         <div class="glass" style="grid-column: 1/-1;">No lyrics added yet for this service.</div>
-                    {% endfor %}
-                </div>
-            </section>
+                        {% endfor %}
+                    </div>
+                </section>
 
-            <!-- Giving Section -->
-            <section id="accounts-section" class="section">
-                <div class="accounts-grid">
-                    {% for account in service.accounts.all %}
+                <!-- Giving Section -->
+                <section id="accounts-section" class="section">
+                    <div class="accounts-grid">
+                        {% for account in service.accounts.all %}
                         <div class="account-card">
                             <h3>{{ account.account_type }}</h3>
                             <div class="account-name-label">{{ account.account_name }}</div>
                             <div class="account-number-box">
-                                <span class="account-number" id="acc-{{ forloop.counter }}">{{ account.account_number }}</span>
+                                <span class="account-number" id="acc-{{ forloop.counter }}">{{ account.account_number
+                                    }}</span>
                                 <button class="copy-btn" onclick="copyToClipboard('acc-{{ forloop.counter }}')">
                                     <i class="bi bi-copy"></i> Copy
                                 </button>
                             </div>
                             <div class="bank-name">{{ account.bank_name }}</div>
                         </div>
-                    {% empty %}
-                        <div class="glass" style="grid-column: 1/-1;">No account details available for this service.</div>
-                    {% endfor %}
-                </div>
-            </section>
+                        {% empty %}
+                        <div class="glass" style="grid-column: 1/-1;">No account details available for this service.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
 
-            <!-- Sermons Section -->
-            <section id="sermons-section" class="section">
-                <div class="sermons-list">
-                    {% for sermon in service.sermons.all %}
+                <!-- Sermons Section -->
+                <section id="sermons-section" class="section">
+                    <div class="sermons-list">
+                        {% for sermon in service.sermons.all %}
                         <div class="sermon-item">
                             <div class="sermon-date">{{ sermon.date_preached }}</div>
                             <h3>{{ sermon.title }}</h3>
                             <p>{{ sermon.notes_or_link }}</p>
                         </div>
-                    {% empty %}
+                        {% empty %}
                         <div class="glass">No sermons recorded yet.</div>
-                    {% endfor %}
-                </div>
-            </section>
+                        {% endfor %}
+                    </div>
+                </section>
 
-            <!-- Announcements Section -->
-            <section id="announcements-section" class="section">
-                <div class="announcements-list">
-                    {% for ann in announcements %}
+                <!-- Announcements Section -->
+                <section id="announcements-section" class="section">
+                    <div class="announcements-list">
+                        {% for ann in announcements %}
                         <div class="announcement-item">
                             <span class="announcement-date">{{ ann.created_at|date:"M d, Y" }}</span>
                             <h3>{{ ann.get_submission_type_display|upper }}</h3>
                             <div class="announcement-content">{{ ann.content }}</div>
                             {% if ann.image %}
-                                <div class="announcement-image">
-                                    <img src="{{ ann.image.url }}" alt="Announcement Image" style="max-width: 100%; border-radius: 12px; margin-top: 1.5rem; border: 1px solid var(--glass-border);">
-                                </div>
+                            <div class="announcement-image">
+                                <img src="{{ ann.image.url }}" alt="Announcement Image"
+                                    style="max-width: 100%; border-radius: 12px; margin-top: 1.5rem; border: 1px solid var(--glass-border);">
+                            </div>
                             {% endif %}
                         </div>
-                    {% empty %}
+                        {% empty %}
                         <div class="glass">No active announcements today.</div>
-                    {% endfor %}
-                </div>
-            </section>
+                        {% endfor %}
+                    </div>
+                </section>
 
-            <!-- Submit Section -->
-            <section id="submit-section" class="section">
-                <div class="form-card glass">
-                    <h2>Share Your Thoughts</h2>
-                    <p class="form-subtext">Suggestions, announcements, or complaints—we value your voice.</p>
-                    <form id="submission-form">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="submission_type">Type</label>
-                            <select name="submission_type" id="submission_type" required>
-                                <option value="suggestion">Suggestion</option>
-                                <option value="announcement">Announcement (Awaits Review)</option>
-                                <option value="complaint">Complaint</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="content">Message</label>
-                            <textarea name="content" id="content" rows="5" placeholder="Share your message here..." required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="image">Attachment (Optional)</label>
-                            <input type="file" name="image" id="image" accept="image/*" class="custom-file-input">
-                        </div>
-                        <div id="image-preview" style="margin-top: 1rem; display: none;">
-                            <img id="preview-img" src="" alt="Preview" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
-                            <p id="preview-filename" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;"></p>
-                        </div>
-                        <button type="submit" class="btn-primary" style="margin-top: 2rem;">Send Message</button>
-                    </form>
-                    <div id="form-feedback"></div>
-                </div>
-            </section>
+                <!-- Submit Section -->
+                <section id="submit-section" class="section">
+                    <div class="form-card glass">
+                        <h2>Share Your Thoughts</h2>
+                        <p class="form-subtext">Suggestions, announcements, or complaints—we value your voice.</p>
+                        <form id="submission-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="submission_type">Type</label>
+                                <select name="submission_type" id="submission_type" required>
+                                    <option value="suggestion">Suggestion</option>
+                                    <option value="announcement">Announcement (Awaits Review)</option>
+                                    <option value="complaint">Complaint</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="content">Message</label>
+                                <textarea name="content" id="content" rows="5" placeholder="Share your message here..."
+                                    required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="image">Attachment (Optional)</label>
+                                <input type="file" name="image" id="image" accept="image/*" class="custom-file-input">
+                            </div>
+                            <div id="image-preview" style="margin-top: 1rem; display: none;">
+                                <img id="preview-img" src="" alt="Preview"
+                                    style="max-width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
+                                <p id="preview-filename"
+                                    style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;"></p>
+                            </div>
+                            <button type="submit" class="btn-primary" style="margin-top: 2rem;">Send Message</button>
+                        </form>
+                        <div id="form-feedback"></div>
+                    </div>
+                </section>
             </div> <!-- End content-wrapper -->
 
             <!-- Premium Footer -->
@@ -217,15 +237,15 @@
                     <div class="footer-brand">
                         <div class="footer-logo">
                             {% if service.logo %}
-                                <img src="{{ service.logo.url }}" alt="{{ service.name }}">
+                            <img src="{{ service.logo.url }}" alt="{{ service.name }}">
                             {% elif service.name == "BIU" %}
-                                <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU">
+                            <img src="{% static 'church/images/biu_logo.svg' %}" alt="BIU">
                             {% elif service.name == "CFI" %}
-                                <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI">
+                            <img src="{% static 'church/images/cfi_logo.svg' %}" alt="CFI">
                             {% elif service.name == "OASIS" %}
-                                <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS">
+                            <img src="{% static 'church/images/oasis_logo.svg' %}" alt="OASIS">
                             {% else %}
-                                <img src="{% static 'church/images/service_hub.svg' %}" alt="Hub">
+                            <img src="{% static 'church/images/service_hub.svg' %}" alt="Hub">
                             {% endif %}
                             <span>{{ service.name|default:"Service Hub" }}</span>
                         </div>
@@ -244,29 +264,37 @@
                     <div class="footer-social">
                         <h4>Connect</h4>
                         <div class="social-icons">
-                            {% if service.tiktok_url %}<a href="{{ service.tiktok_url }}" target="_blank"><i class="bi bi-tiktok"></i></a>{% endif %}
-                            {% if service.instagram_url %}<a href="{{ service.instagram_url }}" target="_blank"><i class="bi bi-instagram"></i></a>{% endif %}
-                            {% if service.youtube_url %}<a href="{{ service.youtube_url }}" target="_blank"><i class="bi bi-youtube"></i></a>{% endif %}
-                            {% if service.twitter_url %}<a href="{{ service.twitter_url }}" target="_blank"><i class="bi bi-twitter-x"></i></a>{% endif %}
-                            {% if service.whatsapp_url %}<a href="{{ service.whatsapp_url }}" target="_blank"><i class="bi bi-whatsapp"></i></a>{% endif %}
-                            
+                            {% if service.tiktok_url %}<a href="{{ service.tiktok_url }}" target="_blank"><i
+                                    class="bi bi-tiktok"></i></a>{% endif %}
+                            {% if service.instagram_url %}<a href="{{ service.instagram_url }}" target="_blank"><i
+                                    class="bi bi-instagram"></i></a>{% endif %}
+                            {% if service.youtube_url %}<a href="{{ service.youtube_url }}" target="_blank"><i
+                                    class="bi bi-youtube"></i></a>{% endif %}
+                            {% if service.twitter_url %}<a href="{{ service.twitter_url }}" target="_blank"><i
+                                    class="bi bi-twitter-x"></i></a>{% endif %}
+                            {% if service.whatsapp_url %}<a href="{{ service.whatsapp_url }}" target="_blank"><i
+                                    class="bi bi-whatsapp"></i></a>{% endif %}
+
                             {% if not service %}
-                                <a href="#" title="TikTok"><i class="bi bi-tiktok"></i></a>
-                                <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
-                                <a href="#" title="YouTube"><i class="bi bi-youtube"></i></a>
+                            <a href="#" title="TikTok"><i class="bi bi-tiktok"></i></a>
+                            <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+                            <a href="#" title="YouTube"><i class="bi bi-youtube"></i></a>
                             {% endif %}
                         </div>
                     </div>
                 </div>
 
                 <div class="footer-bottom">
-                    <p onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')" style="cursor:pointer; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                    <p onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')"
+                        style="cursor:pointer; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'"
+                        onmouseout="this.style.opacity='1'">
                         &copy; {% now "Y" %} Penguins Can Code. All rights reserved.
                     </p>
                     <div class="footer-credits">
                         <p class="developed-by">Ideated by <strong>Nelson Ighodaro</strong></p>
-                        <p class="built-by">Built by 
-                            <span class="creator-id-container" onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')">
+                        <p class="built-by">Built by
+                            <span class="creator-id-container"
+                                onclick="window.open('https://id-portfolio-pcc.vercel.app/', '_blank')">
                                 <span class="id-text">ID</span>
                                 <span class="founder-text">Founder of PCC</span>
                             </span>
@@ -286,20 +314,20 @@
         function switchSection(id) {
             // Close mobile nav after selection
             document.body.classList.remove('mobile-nav-open');
-            
+
             // Update Active Nav Link
             document.querySelectorAll(".nav-links li").forEach(l => l.classList.remove("active"));
             const activeLink = document.querySelector(`.nav-links li[onclick*="'${id}'"]`);
-            if(activeLink) activeLink.classList.add("active");
+            if (activeLink) activeLink.classList.add("active");
 
             // Update Active Section
             document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
             const activeSection = document.getElementById(`${id}-section`);
-            if(activeSection) activeSection.classList.add("active");
+            if (activeSection) activeSection.classList.add("active");
 
             // Update Title
             document.getElementById("page-title").textContent = id.charAt(0).toUpperCase() + id.slice(1);
-            
+
             // Scroll to top
             document.querySelector(".content-area").scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -328,13 +356,13 @@
         const previewImg = document.getElementById('preview-img');
         const previewFilename = document.getElementById('preview-filename');
 
-        if(imageInput) {
-            imageInput.addEventListener('change', function() {
+        if (imageInput) {
+            imageInput.addEventListener('change', function () {
                 const file = this.files[0];
                 if (file) {
                     const reader = new FileReader();
                     previewFilename.textContent = file.name;
-                    reader.onload = function(e) {
+                    reader.onload = function (e) {
                         previewImg.src = e.target.result;
                         previewContainer.style.display = 'block';
                     }
@@ -345,7 +373,7 @@
             });
         }
 
-        if(form) {
+        if (form) {
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 const formData = new FormData(form);
@@ -353,7 +381,7 @@
                 try {
                     const res = await fetch("/api/submissions/", {
                         method: "POST",
-                        headers: { 
+                        headers: {
                             "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
                         },
                         body: formData
@@ -373,4 +401,5 @@
         }
     </script>
 </body>
+
 </html>
