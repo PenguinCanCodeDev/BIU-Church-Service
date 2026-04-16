@@ -163,9 +163,9 @@
                     <div class="sermons-list">
                         {% for sermon in service.sermons.all %}
                         <div class="sermon-item">
-                            <div class="sermon-date">{{ sermon.date_preached }}</div>
+                            <div class="sermon-date">{{ sermon.date_preached|date:"F j, Y" }}</div>
                             <h3>{{ sermon.title }}</h3>
-                            <p>{{ sermon.notes_or_link }}</p>
+                            <div class="sermon-notes">{{ sermon.notes_or_link|linebreaksbr }}</div>
                         </div>
                         {% empty %}
                         <div class="glass">No sermons recorded yet.</div>
@@ -399,6 +399,37 @@
                 }
             });
         }
+        // Sermon Notes Prettifier
+        function formatSermonNotes() {
+            const keywords = [
+                'WORD:', 'SCRIPTURAL REFERENCES:', 'MESSAGE:', 'INTRODUCTION:', 
+                'MAIN MESSAGE:', 'CONCLUSION:', 'PRAYER POINTS:', 'MESSAGE'
+            ];
+            
+            document.querySelectorAll('.sermon-notes').forEach(note => {
+                let html = note.innerHTML;
+                keywords.forEach(kw => {
+                    // Match keyword even if it doesn't have a colon if it's followed by a space or end of string
+                    const regex = new RegExp(`(${kw})`, 'gi');
+                    html = html.replace(regex, '<span class="sermon-keyword">$1</span>');
+                });
+                note.innerHTML = html;
+            });
+        }
+
+        // Initialize formatting
+        document.addEventListener('DOMContentLoaded', () => {
+            formatSermonNotes();
+        });
+
+        // Re-format when switching to sermons section
+        const originalSwitch = switchSection;
+        window.switchSection = function(id) {
+            originalSwitch(id);
+            if (id === 'sermons') {
+                formatSermonNotes();
+            }
+        };
     </script>
 </body>
 
