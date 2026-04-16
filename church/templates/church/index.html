@@ -143,8 +143,7 @@
                             <h3>{{ account.account_type }}</h3>
                             <div class="account-name-label">{{ account.account_name }}</div>
                             <div class="account-number-box">
-                                <span class="account-number" id="acc-{{ forloop.counter }}">{{ account.account_number
-                                    }}</span>
+                                <span class="account-number" id="acc-{{ forloop.counter }}">{{ account.account_number }}</span>
                                 <button class="copy-btn" onclick="copyToClipboard('acc-{{ forloop.counter }}')">
                                     <i class="bi bi-copy"></i> Copy
                                 </button>
