@@ -82,7 +82,11 @@
                 <div class="hero-card glass">
                     <div class="hero-content">
                         {% if service %}
-                            <h1>Welcome to {{ service.name }}</h1>
+                            {% if service.name == "CFI" %}
+                                <h1>CFI o CFI, What a JOY...</h1>
+                            {% else %}
+                                <h1>Welcome to {{ service.name }}</h1>
+                            {% endif %}
                             <p>Your spiritual companion for today's service. Access lyrics, giving details, and sermon notes in real-time.</p>
                         {% else %}
                             <h1>BIU Services Hub</h1>
