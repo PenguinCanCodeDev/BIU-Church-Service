@@ -401,18 +401,23 @@
         // Sermon Notes Prettifier
         function formatSermonNotes() {
             const keywords = [
-                'WORD:', 'SCRIPTURAL REFERENCES:', 'MESSAGE:', 'INTRODUCTION:', 
-                'MAIN MESSAGE:', 'CONCLUSION:', 'PRAYER POINTS:', 'MESSAGE'
+                'WORD', 'SCRIPTURAL REFERENCES', 'MESSAGE', 'INTRODUCTION', 
+                'MAIN MESSAGE', 'CONCLUSION', 'PRAYER POINTS', 'NOTE'
             ];
             
             document.querySelectorAll('.sermon-notes').forEach(note => {
+                // Prevent double formatting
+                if (note.getAttribute('data-formatted') === 'true') return;
+                
                 let html = note.innerHTML;
                 keywords.forEach(kw => {
-                    // Match keyword even if it doesn't have a colon if it's followed by a space or end of string
-                    const regex = new RegExp(`(${kw})`, 'gi');
+                    // Match keyword followed by optional colon and space/boundary
+                    // Using \b for word boundaries
+                    const regex = new RegExp(`\\b(${kw}:?)\\b`, 'gi');
                     html = html.replace(regex, '<span class="sermon-keyword">$1</span>');
                 });
                 note.innerHTML = html;
+                note.setAttribute('data-formatted', 'true');
             });
         }
 
