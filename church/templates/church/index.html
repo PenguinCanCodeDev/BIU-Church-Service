@@ -401,22 +401,33 @@
         // Sermon Notes Prettifier
         function formatSermonNotes() {
             const keywords = [
-                'WORD', 'SCRIPTURAL REFERENCES', 'MESSAGE', 'INTRODUCTION', 
-                'MAIN MESSAGE', 'CONCLUSION', 'PRAYER POINTS', 'NOTE'
+                'WORD', 'SCRIPTURAL REFERENCES', 'SCRIPTURE REFERENCES', 'MESSAGE', 
+                'INTRODUCTION', 'MAIN MESSAGE', 'CONCLUSION', 'PRAYER POINTS', 'NOTE'
             ];
             
             document.querySelectorAll('.sermon-notes').forEach(note => {
-                // Prevent double formatting
                 if (note.getAttribute('data-formatted') === 'true') return;
                 
                 let html = note.innerHTML;
+                
+                // 1. First, temporarily protect existing line breaks
+                html = html.replace(/<br\s*\/?>/gi, '\n');
+                
+                // 2. Format keywords
                 keywords.forEach(kw => {
-                    // Match keyword followed by optional colon and space/boundary
-                    // Using \b for word boundaries
-                    const regex = new RegExp(`\\b(${kw}:?)\\b`, 'gi');
-                    html = html.replace(regex, '<span class="sermon-keyword">$1</span>');
+                    // Match keyword followed by optional colon and optional space
+                    // We don't use \b at the end so we can capture the colon
+                    const regex = new RegExp(`\\b(${kw})\\s*:?`, 'gi');
+                    html = html.replace(regex, '<span class="sermon-keyword">$1:</span> ');
                 });
-                note.innerHTML = html;
+                
+                // 3. Clean up double colons if any
+                html = html.replace(/:+:(\s*)/g, ':$1');
+                
+                // 4. Handle adjacent headers to prevent massive gaps
+                html = html.replace(/<\/span>\s*<span class="sermon-keyword">/g, ' / </span><span class="sermon-keyword">');
+                
+                note.innerHTML = html.replace(/\n/g, '<br>');
                 note.setAttribute('data-formatted', 'true');
             });
         }
