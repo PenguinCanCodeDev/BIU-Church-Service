@@ -62,3 +62,10 @@ class UserSubmission(models.Model):
 
     def __str__(self):
         return f"{self.get_submission_type_display()} - {self.created_at.date()}"
+
+class Announcement(UserSubmission):
+    """ Proxy model for cleaner Admin sidebar management """
+    class Meta:
+        proxy = True
+        verbose_name = "Announcement"
+        verbose_name_plural = "Announcements"
