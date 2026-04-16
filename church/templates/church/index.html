@@ -159,12 +159,12 @@
                 <div class="announcements-list">
                     {% for ann in announcements %}
                         <div class="announcement-item">
-                            <div class="announcement-date">{{ ann.created_at|date:"M d, Y" }}</div>
+                            <span class="announcement-date">{{ ann.created_at|date:"M d, Y" }}</span>
                             <h3>{{ ann.get_submission_type_display|upper }}</h3>
-                            <p>{{ ann.content }}</p>
+                            <div class="announcement-content">{{ ann.content }}</div>
                             {% if ann.image %}
                                 <div class="announcement-image">
-                                    <img src="{{ ann.image.url }}" alt="Announcement Image" style="max-width: 100%; border-radius: 12px; margin-top: 1rem;">
+                                    <img src="{{ ann.image.url }}" alt="Announcement Image" style="max-width: 100%; border-radius: 12px; margin-top: 1.5rem; border: 1px solid var(--glass-border);">
                                 </div>
                             {% endif %}
                         </div>
