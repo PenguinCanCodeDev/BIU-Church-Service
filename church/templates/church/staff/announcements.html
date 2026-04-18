@@ -73,11 +73,18 @@
         {% endif %}
 
         <div class="glass" style="margin-bottom: 3rem;">
-            <h2><i class="bi bi-plus-circle"></i> Quick Post</h2>
-            <form method="POST" enctype="multipart/form-data">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2><i class="bi bi-plus-circle"></i> Quick Post</h2>
+                <div id="template-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.75rem; opacity: 0.6; align-self: center;">Templates:</span>
+                    <button type="button" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="applyTemplate('CFI to OASIS')">CFI to OASIS</button>
+                    <button type="button" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="applyTemplate('Service Reminder')">Service Reminder</button>
+                </div>
+            </div>
+            <form method="POST" enctype="multipart/form-data" id="postForm">
                 {% csrf_token %}
                 <div style="margin-bottom: 1.5rem;">
-                    <textarea name="content" placeholder="What's happening? Type your announcement here..." style="width: 100%; border-radius: 12px; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; min-height: 100px; font-family: inherit; font-size: 1rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" required></textarea>
+                    <textarea name="content" id="announcement-content" placeholder="What's happening? Type your announcement here..." style="width: 100%; border-radius: 12px; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; min-height: 100px; font-family: inherit; font-size: 1rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" required></textarea>
                 </div>
                 <div class="quick-post-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
                     <label class="file-upload">
@@ -92,6 +99,26 @@
         </div>
 
         <script>
+            const templates = {
+                'CFI to OASIS': 'CFI moved to OASIS for today\'s service. Join us as we lift the name of JESUS high!',
+                'Service Reminder': 'Reminder: Join us tomorrow for an uplifting session of worship and word.'
+            };
+
+            function applyTemplate(name) {
+                const textarea = document.getElementById('announcement-content');
+                textarea.value = templates[name];
+                textarea.focus();
+                // Smooth scroll to form if needed
+                document.getElementById('postForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            function editAnnouncement(content) {
+                const textarea = document.getElementById('announcement-content');
+                textarea.value = content;
+                textarea.focus();
+                document.getElementById('postForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
             function updateFileName(input) {
                 const label = document.getElementById('file-label-text');
                 if (input.files && input.files.length > 0) {
@@ -112,12 +139,15 @@
                         {% if p.image %}
                             <img src="{{ p.image.url }}" alt="Submission Image" style="max-width: 100%; border-radius: 10px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1);">
                         {% endif %}
-                        <form method="POST" class="controls">
-                            {% csrf_token %}
-                            <input type="hidden" name="submission_id" value="{{ p.id }}">
-                            <button type="submit" name="action" value="approve" class="btn btn-approve">Approve</button>
-                            <button type="submit" name="action" value="delete" class="btn btn-delete">Reject</button>
-                        </form>
+                        <div class="controls">
+                            <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="editAnnouncement('{{ p.content|escapejs }}')"><i class="bi bi-pencil"></i> Edit</button>
+                            <form method="POST" style="display: inline-flex; gap: 0.5rem;">
+                                {% csrf_token %}
+                                <input type="hidden" name="submission_id" value="{{ p.id }}">
+                                <button type="submit" name="action" value="approve" class="btn btn-approve">Approve</button>
+                                <button type="submit" name="action" value="delete" class="btn btn-delete">Reject</button>
+                            </form>
+                        </div>
                     </div>
                 {% empty %}
                     <p>Clean inbox! No pending submissions.</p>
@@ -127,17 +157,20 @@
             <div class="column">
                 <h2>Approved Posts</h2>
                 {% for a in approved %}
-                    <div class="glass" style="opacity: 0.6;">
+                    <div class="glass" style="opacity: 0.8;">
                         <span class="badge" style="background:#22c55e">{{ a.get_submission_type_display }}</span>
                         <p>{{ a.content }}</p>
                         {% if a.image %}
                             <img src="{{ a.image.url }}" alt="Submission Image" style="max-width: 100%; border-radius: 10px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1); opacity: 0.8;">
                         {% endif %}
-                        <form method="POST" class="controls">
-                            {% csrf_token %}
-                            <input type="hidden" name="submission_id" value="{{ a.id }}">
-                            <button type="submit" name="action" value="delete" class="btn btn-delete">Delete</button>
-                        </form>
+                        <div class="controls">
+                             <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="editAnnouncement('{{ a.content|escapejs }}')"><i class="bi bi-pencil"></i> Edit</button>
+                            <form method="POST" style="display: inline-flex;">
+                                {% csrf_token %}
+                                <input type="hidden" name="submission_id" value="{{ a.id }}">
+                                <button type="submit" name="action" value="delete" class="btn btn-delete">Delete</button>
+                            </form>
+                        </div>
                     </div>
                 {% empty %}
                     <p>No approved announcements yet.</p>
