@@ -76,9 +76,19 @@
             <h2><i class="bi bi-plus-circle"></i> Quick Post</h2>
             <form method="POST" enctype="multipart/form-data" id="postForm">
                 {% csrf_token %}
+                <input type="hidden" name="original_submission_id" id="original_submission_id">
+                
                 <div style="margin-bottom: 1.5rem;">
                     <textarea name="content" id="announcement-content" placeholder="What's happening? Type your announcement here..." style="width: 100%; border-radius: 12px; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; min-height: 100px; font-family: inherit; font-size: 1rem; outline: none; transition: border-color 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" required></textarea>
                 </div>
+
+                <!-- Image Reuse Preview -->
+                <div id="reuse-preview-container" style="display: none; margin-bottom: 1.5rem; position: relative; width: fit-content;">
+                    <p style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 0.5rem;"><i class="bi bi-link-45deg"></i> Reusing Image:</p>
+                    <img id="reuse-preview-img" src="" style="max-height: 150px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                    <button type="button" onclick="clearReuseImage()" style="position: absolute; top: 1.5rem; right: -0.5rem; background: var(--primary); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.6rem;"><i class="bi bi-x"></i></button>
+                </div>
+
                 <div class="quick-post-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
                     <label class="file-upload">
                         <input type="file" name="image" accept="image/*" onchange="updateFileName(this)">
@@ -92,7 +102,7 @@
         </div>
 
         <script>
-            function reuseForService(content, serviceName) {
+            function reuseForService(content, serviceName, submissionId, imageUrl) {
                 const textarea = document.getElementById('announcement-content');
                 let prefix = '';
                 if (serviceName === 'CFI') prefix = '🔥 CFI: ';
@@ -101,14 +111,38 @@
                 
                 textarea.value = prefix + content;
                 textarea.focus();
+
+                if (submissionId && imageUrl) {
+                    document.getElementById('original_submission_id').value = submissionId;
+                    document.getElementById('reuse-preview-img').src = imageUrl;
+                    document.getElementById('reuse-preview-container').style.display = 'block';
+                } else {
+                    clearReuseImage();
+                }
+
                 document.getElementById('postForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
-            function editAnnouncement(content) {
+            function editAnnouncement(content, submissionId, imageUrl) {
                 const textarea = document.getElementById('announcement-content');
                 textarea.value = content;
                 textarea.focus();
+
+                if (submissionId && imageUrl) {
+                    document.getElementById('original_submission_id').value = submissionId;
+                    document.getElementById('reuse-preview-img').src = imageUrl;
+                    document.getElementById('reuse-preview-container').style.display = 'block';
+                } else {
+                    clearReuseImage();
+                }
+
                 document.getElementById('postForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            function clearReuseImage() {
+                document.getElementById('original_submission_id').value = '';
+                document.getElementById('reuse-preview-container').style.display = 'none';
+                document.getElementById('reuse-preview-img').src = '';
             }
 
             function updateFileName(input) {
@@ -117,6 +151,8 @@
                     label.innerHTML = `<i class="bi bi-check-circle-fill" style="color:#22c55e"></i> ${input.files[0].name.substring(0, 15)}...`;
                     label.style.borderColor = '#22c55e';
                     label.style.color = 'white';
+                    // If a new file is uploaded, hide reuse preview to avoid confusion
+                    clearReuseImage();
                 }
             }
         </script>
@@ -132,7 +168,7 @@
                             <img src="{{ p.image.url }}" alt="Submission Image" style="max-width: 100%; border-radius: 10px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1);">
                         {% endif %}
                         <div class="controls">
-                            <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="editAnnouncement('{{ p.content|escapejs }}')"><i class="bi bi-pencil"></i> Edit</button>
+                            <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="editAnnouncement('{{ p.content|escapejs }}', '{{ p.id }}', '{% if p.image %}{{ p.image.url }}{% endif %}')"><i class="bi bi-pencil"></i> Edit</button>
                             <form method="POST" style="display: inline-flex; gap: 0.5rem;">
                                 {% csrf_token %}
                                 <input type="hidden" name="submission_id" value="{{ p.id }}">
@@ -158,13 +194,13 @@
                         
                         <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
                             <span style="font-size: 0.7rem; opacity: 0.5; width: 100%; margin-bottom: 0.2rem;">Reuse for:</span>
-                            <button type="button" class="btn" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'CFI')">CFI</button>
-                            <button type="button" class="btn" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'OASIS')">OASIS</button>
-                            <button type="button" class="btn" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'BIU')">BIU</button>
+                            <button type="button" class="btn" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'CFI', '{{ a.id }}', '{% if a.image %}{{ a.image.url }}{% endif %}')">CFI</button>
+                            <button type="button" class="btn" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'OASIS', '{{ a.id }}', '{% if a.image %}{{ a.image.url }}{% endif %}')">OASIS</button>
+                            <button type="button" class="btn" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'BIU', '{{ a.id }}', '{% if a.image %}{{ a.image.url }}{% endif %}')">BIU</button>
                         </div>
 
                         <div class="controls">
-                             <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="editAnnouncement('{{ a.content|escapejs }}')"><i class="bi bi-pencil"></i> Edit</button>
+                             <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="editAnnouncement('{{ a.content|escapejs }}', '{{ a.id }}', '{% if a.image %}{{ a.image.url }}{% endif %}')"><i class="bi bi-pencil"></i> Edit</button>
                             <form method="POST" style="display: inline-flex;">
                                 {% csrf_token %}
                                 <input type="hidden" name="submission_id" value="{{ a.id }}">

@@ -132,12 +132,25 @@ def manage_announcements(request):
         if action == "create":
             content = request.POST.get('content')
             image = request.FILES.get('image')
-            UserSubmission.objects.create(
+            original_id = request.POST.get('original_submission_id')
+            
+            new_announcement = UserSubmission.objects.create(
                 submission_type='announcement',
                 content=content,
                 image=image,
                 is_approved=True
             )
+            
+            # Reuse image if original_id is provided and no new image uploaded
+            if not image and original_id:
+                try:
+                    original = UserSubmission.objects.get(id=original_id)
+                    if original.image:
+                        new_announcement.image = original.image
+                        new_announcement.save()
+                except UserSubmission.DoesNotExist:
+                    pass
+                    
             messages.success(request, "Announcement posted successfully!")
         else:
             submission_id = request.POST.get('submission_id')
