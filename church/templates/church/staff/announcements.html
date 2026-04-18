@@ -73,16 +73,7 @@
         {% endif %}
 
         <div class="glass" style="margin-bottom: 3rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2><i class="bi bi-plus-circle"></i> Quick Post</h2>
-                <div id="template-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <span style="font-size: 0.75rem; opacity: 0.6; align-self: center;">Templates:</span>
-                    <button type="button" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="applyTemplate('CFI')">CFI</button>
-                    <button type="button" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="applyTemplate('OASIS')">OASIS</button>
-                    <button type="button" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="applyTemplate('BIU')">BIU</button>
-                    <button type="button" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="applyTemplate('CFI to OASIS')">CFI to OASIS</button>
-                </div>
-            </div>
+            <h2><i class="bi bi-plus-circle"></i> Quick Post</h2>
             <form method="POST" enctype="multipart/form-data" id="postForm">
                 {% csrf_token %}
                 <div style="margin-bottom: 1.5rem;">
@@ -101,19 +92,15 @@
         </div>
 
         <script>
-            const templates = {
-                'CFI': '🔥 CFI JOINT SERVICE! 🔥\nJoin us this Tuesday for an atmosphere of deep worship and transformative word. Don\'t come alone!',
-                'OASIS': '✨ OASIS SERVICE ✨\nSunday is here again! We are refreshing our souls at the Oasis. Join us by 8:00 AM.',
-                'BIU': '🔵 BIU SERVICE 🔵\nMid-week grace is available! Join the BIU community this Thursday for a life-changing service.',
-                'CFI to OASIS': 'CFI moved to OASIS for today\'s service. Join us as we lift the name of JESUS high!',
-                'Service Reminder': 'Reminder: Join us tomorrow for an uplifting session of worship and word.'
-            };
-
-            function applyTemplate(name) {
+            function reuseForService(content, serviceName) {
                 const textarea = document.getElementById('announcement-content');
-                textarea.value = templates[name];
+                let prefix = '';
+                if (serviceName === 'CFI') prefix = '🔥 CFI: ';
+                else if (serviceName === 'OASIS') prefix = '✨ OASIS: ';
+                else if (serviceName === 'BIU') prefix = '🔵 BIU: ';
+                
+                textarea.value = prefix + content;
                 textarea.focus();
-                // Smooth scroll to form if needed
                 document.getElementById('postForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
@@ -162,12 +149,20 @@
             <div class="column">
                 <h2>Approved Posts</h2>
                 {% for a in approved %}
-                    <div class="glass" style="opacity: 0.8;">
+                    <div class="glass" style="opacity: 0.9;">
                         <span class="badge" style="background:#22c55e">{{ a.get_submission_type_display }}</span>
                         <p>{{ a.content }}</p>
                         {% if a.image %}
                             <img src="{{ a.image.url }}" alt="Submission Image" style="max-width: 100%; border-radius: 10px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1); opacity: 0.8;">
                         {% endif %}
+                        
+                        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
+                            <span style="font-size: 0.7rem; opacity: 0.5; width: 100%; margin-bottom: 0.2rem;">Reuse for:</span>
+                            <button type="button" class="btn" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'CFI')">CFI</button>
+                            <button type="button" class="btn" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'OASIS')">OASIS</button>
+                            <button type="button" class="btn" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="reuseForService('{{ a.content|escapejs }}', 'BIU')">BIU</button>
+                        </div>
+
                         <div class="controls">
                              <button type="button" class="btn" style="background: rgba(255,255,255,0.1);" onclick="editAnnouncement('{{ a.content|escapejs }}')"><i class="bi bi-pencil"></i> Edit</button>
                             <form method="POST" style="display: inline-flex;">
